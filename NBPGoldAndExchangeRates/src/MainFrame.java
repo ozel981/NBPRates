@@ -9,6 +9,7 @@ public class MainFrame extends JFrame {
         initFrame();
     }
 
+    private double weightxy = 0.2;
     private int count = 0;
     private JLabel label;
     private JPanel mainPanel;
@@ -19,7 +20,7 @@ public class MainFrame extends JFrame {
 
         initCanvas();
         initExchangesList();
-        initData();
+        initDateRange();
         initButton();
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,13 +42,13 @@ public class MainFrame extends JFrame {
         mainPanel.add(panel, c);
     }
 
-    private void initData() {
+    private void initDateRange() {
         GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel();
         panel.setBackground(Color.yellow);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
-        c.weighty = 0.25;
+        c.weighty = weightxy;
         c.gridx = 0;
         c.gridy = 6;
         mainPanel.add(panel, c);
@@ -58,11 +59,13 @@ public class MainFrame extends JFrame {
         JPanel panel = new JPanel();
         panel.setBackground(Color.green);
         c.fill = GridBagConstraints.BOTH;
-        c.weightx = 0.25;
+        c.weightx = weightxy;
         c.weighty = 1;
         c.gridx = 6;
         c.gridy = 0;
         mainPanel.add(panel, c);
+
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
         JList list = new JList(new CheckListItem[]{new CheckListItem("apple"),
                 new CheckListItem("orange"), new CheckListItem("mango"),
@@ -93,19 +96,26 @@ public class MainFrame extends JFrame {
 
         JScrollPane listScroller = new JScrollPane(list);
 
+        panel.add(Box.createRigidArea(new Dimension(0, 0)));
         panel.add(listScroller);
     }
 
     private void initButton() {
         GridBagConstraints c = new GridBagConstraints();
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.red);
         c.fill = GridBagConstraints.BOTH;
-        c.weightx = 0.25;
-        c.weighty = 0.25;
+        c.weightx = weightxy;
+        c.weighty = weightxy;
         c.gridx = 6;
         c.gridy = 6;
         mainPanel.add(panel, c);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.BOTH;
+        JButton button = new JButton("Pobierz");
+        panel.add(button,gbc);
     }
 }
 
