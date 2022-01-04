@@ -32,7 +32,7 @@ public class MainFrame extends JFrame {
 
     private void initCanvas() {
         GridBagConstraints c = new GridBagConstraints();
-        JPanel panel = new JPanel();
+        DrawingPanel panel = new DrawingPanel();
         panel.setBackground(Color.magenta);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
@@ -40,6 +40,8 @@ public class MainFrame extends JFrame {
         c.gridx = 0;
         c.gridy = 0;
         mainPanel.add(panel, c);
+
+
     }
 
     private void initDateRange() {
@@ -52,6 +54,11 @@ public class MainFrame extends JFrame {
         c.gridx = 0;
         c.gridy = 6;
         mainPanel.add(panel, c);
+
+        JTextField startDate = new JTextField(10);
+        JTextField endDate = new JTextField(10);
+        panel.add(startDate);
+        panel.add(endDate);
     }
 
     private void initExchangesList() {
