@@ -1,3 +1,5 @@
+import app.repository.Repository;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -13,6 +15,7 @@ public class MainFrame extends JFrame {
     private int count = 0;
     private JLabel label;
     private JPanel mainPanel;
+    private Repository repository = new Repository("http://api.nbp.pl/api");
 
     private void initFrame() {
         mainPanel = new JPanel(new GridBagLayout());
@@ -74,16 +77,12 @@ public class MainFrame extends JFrame {
 
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        JList list = new JList(new CheckListItem[]{new CheckListItem("apple"),
-                new CheckListItem("orange"), new CheckListItem("mango"),
-                new CheckListItem("orange"), new CheckListItem("mango"),
-                new CheckListItem("orange"), new CheckListItem("mango"),
-                new CheckListItem("orange"), new CheckListItem("mango"),
-                new CheckListItem("orange"), new CheckListItem("mango"),
-                new CheckListItem("orange"), new CheckListItem("mango"),
-                new CheckListItem("orange"), new CheckListItem("mango"),
-
-                new CheckListItem("paw paw"), new CheckListItem("banana")});
+        JList list = null;
+        try {
+            list = new JList(repository.getExchanges().stream().map((exchange -> new CheckListItem(exchange))).toArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         list.setCellRenderer(new CheckListRenderer());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setVisibleRowCount(10);
@@ -122,7 +121,14 @@ public class MainFrame extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
         JButton button = new JButton("Pobierz");
-        panel.add(button,gbc);
+        button.addActionListener((s) -> {
+            try {
+                repository.getExchanges();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        panel.add(button, gbc);
     }
 }
 
