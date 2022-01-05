@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainFrame extends JFrame {
     MainFrame(String title) {
@@ -11,11 +14,13 @@ public class MainFrame extends JFrame {
         initFrame();
     }
 
-    private double weightxy = 0.2;
-    private int count = 0;
-    private JLabel label;
+    private final double weightxy = 0.2;
     private JPanel mainPanel;
     private Repository repository = new Repository("http://api.nbp.pl/api");
+    private JList list = null;
+    private CheckListItem[] checkList;
+    private JTextField startDate;
+    private JTextField endDate;
 
     private void initFrame() {
         mainPanel = new JPanel(new GridBagLayout());
@@ -57,11 +62,11 @@ public class MainFrame extends JFrame {
         c.gridx = 0;
         c.gridy = 6;
         mainPanel.add(panel, c);
-
-        JTextField startDate = new JTextField(10);
-        JTextField endDate = new JTextField(10);
+        startDate = new JTextField(10);
+        endDate = new JTextField(10);
         panel.add(startDate);
         panel.add(endDate);
+
     }
 
     private void initExchangesList() {
@@ -77,9 +82,14 @@ public class MainFrame extends JFrame {
 
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        JList list = null;
+
         try {
-            list = new JList(repository.getExchanges().stream().map((exchange -> new CheckListItem(exchange))).toArray());
+            List<CheckListItem> itemList = new ArrayList<CheckListItem>();
+            for (String exchange : repository.getExchanges()) {
+                itemList.add(new CheckListItem(exchange));
+            }
+            checkList = itemList.toArray(new CheckListItem[0]);
+            list = new JList(checkList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,14 +132,47 @@ public class MainFrame extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         JButton button = new JButton("Pobierz");
         button.addActionListener((s) -> {
-            try {
-                repository.getExchanges();
-            } catch (Exception e) {
-                e.printStackTrace();
+            LocalDate start = LocalDate.parse(startDate.getText());
+            LocalDate end = LocalDate.parse(endDate.getText());
+            if (end.isAfter(LocalDate.now())) {
+                end = LocalDate.now();
+                endDate.setText(end.toString());
             }
+            if (start.isAfter(end)) {
+                start = end;
+                startDate.setText(start.toString());
+            }
+            List<ExchangeData> exchanges = new ArrayList<ExchangeData>();
+            for (CheckListItem checkElem : checkList) {
+                if (checkElem.isSelected()) {
+                    ExchangeData exchange = new ExchangeData(checkElem.toString());
+                    start.plusYears(1);
+                    for (LocalDate date = start; date.isBefore(end); date = date.plusYears(1)) {
+                        try {
+                            LocalDate startt = date;
+                            startt.minusYears(1);
+                            exchange.rates.addAll(repository.getExchangeRate(checkElem.toString(), startt.toString(), date.toString()));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    exchanges.add(exchange);
+                }
+            }
+            System.out.println(exchanges);
         });
         panel.add(button, gbc);
     }
+}
+
+class ExchangeData {
+    ExchangeData(String code) {
+        this.code = code;
+        rates = new ArrayList<Double>();
+    }
+
+    public String code;
+    public List<Double> rates;
 }
 
 class CheckListItem {
