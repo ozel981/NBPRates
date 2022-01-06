@@ -4,12 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainFrame extends JFrame {
-    MainFrame(String title) {
+    public MainFrame(String title) {
         super(title);
         initFrame();
     }
@@ -18,7 +17,7 @@ public class MainFrame extends JFrame {
     private JPanel mainPanel;
     private Repository repository = new Repository("http://api.nbp.pl/api");
     private JList list = null;
-    private CheckListItem[] checkList;
+    private CheckListItem[] exchanges;
     private JTextField startDate;
     private JTextField endDate;
 
@@ -88,8 +87,8 @@ public class MainFrame extends JFrame {
             for (String exchange : repository.getExchanges()) {
                 itemList.add(new CheckListItem(exchange));
             }
-            checkList = itemList.toArray(new CheckListItem[0]);
-            list = new JList(checkList);
+            exchanges = itemList.toArray(new CheckListItem[0]);
+            list = new JList(exchanges);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,82 +130,8 @@ public class MainFrame extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
         JButton button = new JButton("Pobierz");
-        button.addActionListener((s) -> {
-            LocalDate start = LocalDate.parse(startDate.getText());
-            LocalDate end = LocalDate.parse(endDate.getText());
-            if (end.isAfter(LocalDate.now())) {
-                end = LocalDate.now();
-                endDate.setText(end.toString());
-            }
-            if (start.isAfter(end)) {
-                start = end;
-                startDate.setText(start.toString());
-            }
-            List<ExchangeData> exchanges = new ArrayList<ExchangeData>();
-            for (CheckListItem checkElem : checkList) {
-                if (checkElem.isSelected()) {
-                    ExchangeData exchange = new ExchangeData(checkElem.toString());
-                    start.plusYears(1);
-                    for (LocalDate date = start; date.isBefore(end); date = date.plusYears(1)) {
-                        try {
-                            LocalDate startt = date;
-                            startt.minusYears(1);
-                            exchange.rates.addAll(repository.getExchangeRate(checkElem.toString(), startt.toString(), date.toString()));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    exchanges.add(exchange);
-                }
-            }
-            System.out.println(exchanges);
-        });
+        button.addActionListener(new FugureDrawer(startDate,endDate,exchanges));
         panel.add(button, gbc);
     }
 }
 
-class ExchangeData {
-    ExchangeData(String code) {
-        this.code = code;
-        rates = new ArrayList<Double>();
-    }
-
-    public String code;
-    public List<Double> rates;
-}
-
-class CheckListItem {
-
-    private String label;
-    private boolean isSelected = false;
-
-    public CheckListItem(String label) {
-        this.label = label;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean isSelected) {
-        this.isSelected = isSelected;
-    }
-
-    @Override
-    public String toString() {
-        return label;
-    }
-}
-
-class CheckListRenderer extends JCheckBox implements ListCellRenderer {
-    public Component getListCellRendererComponent(JList list, Object value,
-                                                  int index, boolean isSelected, boolean hasFocus) {
-        setEnabled(list.isEnabled());
-        setSelected(((CheckListItem) value).isSelected());
-        setFont(list.getFont());
-        setBackground(list.getBackground());
-        setForeground(list.getForeground());
-        setText(value.toString());
-        return this;
-    }
-}

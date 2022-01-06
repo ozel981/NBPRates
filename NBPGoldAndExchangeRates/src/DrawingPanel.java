@@ -1,20 +1,30 @@
 import javax.swing.*;
 import java.awt.*;
-
-class Point {
-    Point(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public double x;
-    public double y;
-}
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.List;
 
 public class DrawingPanel extends JPanel {
+    List<ExchangeData> exchangesRates;
+    LocalDate start = LocalDate.now();
+    LocalDate end = LocalDate.now();
+    void draw(List<ExchangeData> exchangesRates,LocalDate start,LocalDate end) {
+        this.start = start;
+        this.end = end;
+        this.exchangesRates = exchangesRates;
+        repaint();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        int days = (int)Duration.between(start,end).toDays();
+        double interval = 1.0;
+        if (this.getWidth() > days) {
+            interval = this.getWidth() / days;
+        } else {
+            
+        }
         Graphics2D graphics = (Graphics2D) g;
         graphics.setStroke(new BasicStroke(4));
         graphics.setColor(Color.pink);
