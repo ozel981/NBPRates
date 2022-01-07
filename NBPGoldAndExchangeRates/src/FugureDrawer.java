@@ -12,11 +12,13 @@ public class FugureDrawer implements ActionListener {
     private JTextField startDate;
     private JTextField endDate;
     private CheckListItem[] exchanges;
+    private DrawingPanel drawingPanel;
 
-    public FugureDrawer(JTextField startDate, JTextField endDate, CheckListItem[] exchanges) {
+    public FugureDrawer(JTextField startDate, JTextField endDate, CheckListItem[] exchanges, DrawingPanel drawingPanel) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.exchanges = exchanges;
+        this.drawingPanel = drawingPanel;
     }
 
     @Override
@@ -34,16 +36,23 @@ public class FugureDrawer implements ActionListener {
         List<ExchangeData> exchangesRates = new ArrayList<ExchangeData>();
         for (CheckListItem exchange : exchanges) {
             if (exchange.isSelected()) {
-                ExchangeData exchangeRate = new ExchangeData(exchange.toString());
-                for (LocalDate date = start.plusYears(1); date.isBefore(end); date = date.plusYears(1)) {
+                ExchangeData exchangeRate = new ExchangeData(exchange.toString(), exchange.getColor());
+                LocalDate date = start.plusYears(1);
+                for (; date.isBefore(end); date = date.plusYears(1)) {
                     try {
                         exchangeRate.rates.addAll(repository.getExchangeRate(exchange.toString(), date.minusYears(1).toString(), date.toString()));
                     } catch (Exception excpetion) {
                         excpetion.printStackTrace();
                     }
                 }
+                try {
+                    exchangeRate.rates.addAll(repository.getExchangeRate(exchange.toString(), date.minusYears(1).toString(), end.toString()));
+                } catch (Exception excpetion) {
+                    excpetion.printStackTrace();
+                }
                 exchangesRates.add(exchangeRate);
             }
         }
+        drawingPanel.draw(exchangesRates,start,end);
     }
 }

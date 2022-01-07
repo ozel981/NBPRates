@@ -15,6 +15,7 @@ public class MainFrame extends JFrame {
 
     private final double weightxy = 0.2;
     private JPanel mainPanel;
+    private DrawingPanel drawingPanel;
     private Repository repository = new Repository("http://api.nbp.pl/api");
     private JList list = null;
     private CheckListItem[] exchanges;
@@ -32,6 +33,7 @@ public class MainFrame extends JFrame {
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 500);
+        this.setMinimumSize(new Dimension(400,400));
         this.setVisible(true);
 
         this.add(mainPanel, BorderLayout.CENTER);
@@ -39,14 +41,14 @@ public class MainFrame extends JFrame {
 
     private void initCanvas() {
         GridBagConstraints c = new GridBagConstraints();
-        DrawingPanel panel = new DrawingPanel();
-        panel.setBackground(Color.magenta);
+        drawingPanel = new DrawingPanel();
+        drawingPanel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = 0;
-        mainPanel.add(panel, c);
+        mainPanel.add(drawingPanel, c);
 
 
     }
@@ -54,7 +56,7 @@ public class MainFrame extends JFrame {
     private void initDateRange() {
         GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel();
-        panel.setBackground(Color.yellow);
+        panel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
         c.weighty = weightxy;
@@ -71,7 +73,7 @@ public class MainFrame extends JFrame {
     private void initExchangesList() {
         GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel();
-        panel.setBackground(Color.green);
+        panel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = weightxy;
         c.weighty = 1;
@@ -118,7 +120,7 @@ public class MainFrame extends JFrame {
     private void initButton() {
         GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(Color.red);
+        panel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = weightxy;
         c.weighty = weightxy;
@@ -130,7 +132,7 @@ public class MainFrame extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
         JButton button = new JButton("Pobierz");
-        button.addActionListener(new FugureDrawer(startDate,endDate,exchanges));
+        button.addActionListener(new FugureDrawer(startDate,endDate,exchanges,drawingPanel));
         panel.add(button, gbc);
     }
 }
