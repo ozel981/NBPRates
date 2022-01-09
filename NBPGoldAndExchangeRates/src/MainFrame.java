@@ -4,18 +4,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainFrame extends JFrame {
-    MainFrame(String title) {
+    public MainFrame(String title) {
         super(title);
         initFrame();
     }
 
-    private double weightxy = 0.2;
-    private int count = 0;
-    private JLabel label;
+    private final double weightxy = 0.2;
     private JPanel mainPanel;
+    private DrawingPanel drawingPanel;
     private Repository repository = new Repository("http://api.nbp.pl/api");
+    private JList list = null;
+    private CheckListItem[] exchanges;
+    private JTextField startDate;
+    private JTextField endDate;
 
     private void initFrame() {
         mainPanel = new JPanel(new GridBagLayout());
@@ -28,6 +33,7 @@ public class MainFrame extends JFrame {
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(500, 500);
+        this.setMinimumSize(new Dimension(400,400));
         this.setVisible(true);
 
         this.add(mainPanel, BorderLayout.CENTER);
@@ -35,14 +41,14 @@ public class MainFrame extends JFrame {
 
     private void initCanvas() {
         GridBagConstraints c = new GridBagConstraints();
-        DrawingPanel panel = new DrawingPanel();
-        panel.setBackground(Color.magenta);
+        drawingPanel = new DrawingPanel();
+        drawingPanel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = 0;
-        mainPanel.add(panel, c);
+        mainPanel.add(drawingPanel, c);
 
 
     }
@@ -50,24 +56,28 @@ public class MainFrame extends JFrame {
     private void initDateRange() {
         GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel();
-        panel.setBackground(Color.yellow);
+        panel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
         c.weighty = weightxy;
         c.gridx = 0;
         c.gridy = 6;
         mainPanel.add(panel, c);
-
-        JTextField startDate = new JTextField(10);
-        JTextField endDate = new JTextField(10);
+        startDate = new JTextField(10);
+        endDate = new JTextField(10);
+        panel.add(new JLabel("od: "));
         panel.add(startDate);
+        panel.add(new JLabel("od: "));
         panel.add(endDate);
+        panel.add(new JLabel("minimalna data 2013-01-01"));
+        panel.add(new JLabel("             Cena złota za 0.01 g"));
+
     }
 
     private void initExchangesList() {
         GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel();
-        panel.setBackground(Color.green);
+        panel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = weightxy;
         c.weighty = 1;
@@ -77,9 +87,15 @@ public class MainFrame extends JFrame {
 
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        JList list = null;
+
         try {
-            list = new JList(repository.getExchanges().stream().map((exchange -> new CheckListItem(exchange))).toArray());
+            List<CheckListItem> itemList = new ArrayList<CheckListItem>();
+            itemList.add(new CheckListItem("GOLD"));
+            for (String exchange : repository.getExchanges()) {
+                itemList.add(new CheckListItem(exchange));
+            }
+            exchanges = itemList.toArray(new CheckListItem[0]);
+            list = new JList(exchanges);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,7 +125,7 @@ public class MainFrame extends JFrame {
     private void initButton() {
         GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(Color.red);
+        panel.setBackground(Color.white);
         c.fill = GridBagConstraints.BOTH;
         c.weightx = weightxy;
         c.weighty = weightxy;
@@ -121,49 +137,8 @@ public class MainFrame extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
         JButton button = new JButton("Pobierz");
-        button.addActionListener((s) -> {
-            try {
-                repository.getExchanges();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        button.addActionListener(new FugureDrawer(startDate,endDate,exchanges,drawingPanel));
         panel.add(button, gbc);
     }
 }
 
-class CheckListItem {
-
-    private String label;
-    private boolean isSelected = false;
-
-    public CheckListItem(String label) {
-        this.label = label;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    public void setSelected(boolean isSelected) {
-        this.isSelected = isSelected;
-    }
-
-    @Override
-    public String toString() {
-        return label;
-    }
-}
-
-class CheckListRenderer extends JCheckBox implements ListCellRenderer {
-    public Component getListCellRendererComponent(JList list, Object value,
-                                                  int index, boolean isSelected, boolean hasFocus) {
-        setEnabled(list.isEnabled());
-        setSelected(((CheckListItem) value).isSelected());
-        setFont(list.getFont());
-        setBackground(list.getBackground());
-        setForeground(list.getForeground());
-        setText(value.toString());
-        return this;
-    }
-}

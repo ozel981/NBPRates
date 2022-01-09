@@ -1,6 +1,7 @@
 package app.repository;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -9,7 +10,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Repository {
@@ -18,21 +18,45 @@ public class Repository {
         client = HttpClient.newHttpClient();
     }
 
-    String uri = "http://api.nbp.pl/api";
+    String uri;
     HttpClient client;
 
-    public void getExchangeRate(String echangeCode, Date start, Date end) throws Exception {
-        get(uri + "/exchangerates/rates/A/" + echangeCode + "/" + start + "/" + end);
+    public List<Double> getExchangeRate(String echangeCode, String start, String end) throws Exception {
+        List<Double> midrates = new ArrayList<Double>();
+        String value = get(uri + "/exchangerates/rates/A/" + echangeCode + "/" + start + "/" + end);
+        JsonObject exchange = JsonParser.parseString(value).getAsJsonObject();
+        JsonArray rates = exchange.get("rates").getAsJsonArray();
+        for (JsonElement rate : rates) {
+            midrates.add(rate.getAsJsonObject().get("mid").getAsDouble());
+        }
+        return midrates;
+    }
+
+    public List<Double> getGoldRates(String echangeCode, String start, String end) throws Exception {
+        List<Double> midrates = new ArrayList<Double>();
+        String value = get(uri + "/cenyzlota/" + start + "/" + end);
+        JsonArray rates = JsonParser.parseString(value).getAsJsonArray();
+        for (JsonElement rate : rates) {
+            midrates.add(rate.getAsJsonObject().get("cena").getAsDouble() / 100);
+        }
+        return midrates;
+    }
+
+    public List<Double> getRates(String echangeCode, String start, String end) throws Exception {
+        if (echangeCode == "GOLD") {
+            return getGoldRates(echangeCode, start, end);
+        } else {
+            return getExchangeRate(echangeCode, start, end);
+        }
     }
 
     public List<String> getExchanges() throws Exception {
         String value = get(uri + "/exchangerates/tables/A");
-        System.out.print(value);
         JsonObject exchangeTable = JsonParser.parseString(value).getAsJsonArray().get(0).getAsJsonObject();
         List<String> exchangeCodes = new ArrayList<String>();
-        JsonArray sss = exchangeTable.get("rates").getAsJsonArray();
-        for(var s : sss) {
-            exchangeCodes.add(s.getAsJsonObject().get("code").getAsString());
+        JsonArray rates = exchangeTable.get("rates").getAsJsonArray();
+        for (JsonElement rate : rates) {
+            exchangeCodes.add(rate.getAsJsonObject().get("code").getAsString());
         }
         return exchangeCodes;
     }
