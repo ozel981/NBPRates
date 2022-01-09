@@ -65,8 +65,12 @@ public class MainFrame extends JFrame {
         mainPanel.add(panel, c);
         startDate = new JTextField(10);
         endDate = new JTextField(10);
+        panel.add(new JLabel("od: "));
         panel.add(startDate);
+        panel.add(new JLabel("od: "));
         panel.add(endDate);
+        panel.add(new JLabel("minimalna data 2013-01-01"));
+        panel.add(new JLabel("             Cena złota za 0.01 g"));
 
     }
 
@@ -86,6 +90,7 @@ public class MainFrame extends JFrame {
 
         try {
             List<CheckListItem> itemList = new ArrayList<CheckListItem>();
+            itemList.add(new CheckListItem("GOLD"));
             for (String exchange : repository.getExchanges()) {
                 itemList.add(new CheckListItem(exchange));
             }

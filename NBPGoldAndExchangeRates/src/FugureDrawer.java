@@ -23,14 +23,34 @@ public class FugureDrawer implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        LocalDate start = LocalDate.parse(startDate.getText());
-        LocalDate end = LocalDate.parse(endDate.getText());
+        LocalDate start = LocalDate.now().minusDays(10);
+        LocalDate end = LocalDate.now();
+        try {
+            start = LocalDate.parse(startDate.getText());
+        } catch (Exception exception) {
+            startDate.setText("2013-01-01");
+            start = LocalDate.parse(startDate.getText());
+        }
+        try {
+            end = LocalDate.parse(endDate.getText());
+        } catch (Exception exception) {
+            endDate.setText(LocalDate.now().toString());
+            end = LocalDate.now();
+        }
         if (end.isAfter(LocalDate.now())) {
             end = LocalDate.now();
             endDate.setText(end.toString());
         }
-        if (start.isAfter(end)) {
-            start = end;
+        if (end.isBefore(LocalDate.of(2013,1,11))) {
+            end = LocalDate.of(2013,1,11);
+            endDate.setText(end.toString());
+        }
+        if (start.isBefore(LocalDate.of(2013,1,1))) {
+            start = LocalDate.of(2013,1,1);
+            startDate.setText("2013-01-01");
+        }
+        if (start.isAfter(end.minusDays(10))) {
+            start = end.minusDays(10);
             startDate.setText(start.toString());
         }
         List<ExchangeData> exchangesRates = new ArrayList<ExchangeData>();
@@ -40,19 +60,19 @@ public class FugureDrawer implements ActionListener {
                 LocalDate date = start.plusYears(1);
                 for (; date.isBefore(end); date = date.plusYears(1)) {
                     try {
-                        exchangeRate.rates.addAll(repository.getExchangeRate(exchange.toString(), date.minusYears(1).toString(), date.toString()));
+                        exchangeRate.rates.addAll(repository.getRates(exchange.toString(), date.minusYears(1).toString(), date.toString()));
                     } catch (Exception excpetion) {
                         excpetion.printStackTrace();
                     }
                 }
                 try {
-                    exchangeRate.rates.addAll(repository.getExchangeRate(exchange.toString(), date.minusYears(1).toString(), end.toString()));
+                    exchangeRate.rates.addAll(repository.getRates(exchange.toString(), date.minusYears(1).toString(), end.toString()));
                 } catch (Exception excpetion) {
                     excpetion.printStackTrace();
                 }
                 exchangesRates.add(exchangeRate);
             }
         }
-        drawingPanel.draw(exchangesRates,start,end);
+        drawingPanel.draw(exchangesRates, start, end);
     }
 }
