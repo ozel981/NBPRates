@@ -7,14 +7,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FugureDrawer implements ActionListener {
+public class RatesGetter implements ActionListener {
     private final Repository repository = new Repository("http://api.nbp.pl/api");
     private JTextField startDate;
     private JTextField endDate;
     private CheckListItem[] exchanges;
     private DrawingPanel drawingPanel;
 
-    public FugureDrawer(JTextField startDate, JTextField endDate, CheckListItem[] exchanges, DrawingPanel drawingPanel) {
+    public RatesGetter(JTextField startDate, JTextField endDate, CheckListItem[] exchanges, DrawingPanel drawingPanel) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.exchanges = exchanges;

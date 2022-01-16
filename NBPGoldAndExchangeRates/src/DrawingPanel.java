@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,6 +45,8 @@ public class DrawingPanel extends JPanel {
         }
         return min;
     }
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -130,6 +133,16 @@ public class DrawingPanel extends JPanel {
             for (int i = 1; i < points.size(); i++) {
                 graphics.drawLine((int) points.get(i - 1).x, (int) points.get(i - 1).y, (int) points.get(i).x, (int) points.get(i).y);
             }
+        }
+        graphics.setColor(Color.black);
+        graphics.setBackground(Color.white);
+        graphics.drawString(df.format(maxVal),3,10);
+        graphics.drawString(df.format(minVal),3, (int) (windowHeight - 10));
+        for(int i=0;i<windowHeight;i+=10) {
+            graphics.drawLine(0,i,2,i);
+        }
+        for(int i=0;i<windowWidth;i+=10) {
+            graphics.drawLine(i,(int)windowHeight,i,(int)windowHeight-2);
         }
     }
 }

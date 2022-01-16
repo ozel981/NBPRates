@@ -48,6 +48,7 @@ public class MainFrame extends JFrame {
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = 0;
+
         mainPanel.add(drawingPanel, c);
 
 
@@ -137,7 +138,7 @@ public class MainFrame extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.BOTH;
         JButton button = new JButton("Pobierz");
-        button.addActionListener(new FugureDrawer(startDate,endDate,exchanges,drawingPanel));
+        button.addActionListener(new RatesGetter(startDate,endDate,exchanges,drawingPanel));
         panel.add(button, gbc);
     }
 }
