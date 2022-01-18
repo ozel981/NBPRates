@@ -21,28 +21,28 @@ public class Repository {
     String uri;
     HttpClient client;
 
-    public List<Double> getExchangeRate(String echangeCode, String start, String end) throws Exception {
-        List<Double> midrates = new ArrayList<Double>();
+    public List<Rate> getExchangeRate(String echangeCode, String start, String end) throws Exception {
+        List<Rate> midrates = new ArrayList<Rate>();
         String value = get(uri + "/exchangerates/rates/A/" + echangeCode + "/" + start + "/" + end);
         JsonObject exchange = JsonParser.parseString(value).getAsJsonObject();
         JsonArray rates = exchange.get("rates").getAsJsonArray();
         for (JsonElement rate : rates) {
-            midrates.add(rate.getAsJsonObject().get("mid").getAsDouble());
+            midrates.add(new Rate(rate.getAsJsonObject().get("mid").getAsDouble(), rate.getAsJsonObject().get("effectiveDate").getAsString()));
         }
         return midrates;
     }
 
-    public List<Double> getGoldRates(String echangeCode, String start, String end) throws Exception {
-        List<Double> midrates = new ArrayList<Double>();
+    public List<Rate> getGoldRates(String echangeCode, String start, String end) throws Exception {
+        List<Rate> midrates = new ArrayList<Rate>();
         String value = get(uri + "/cenyzlota/" + start + "/" + end);
         JsonArray rates = JsonParser.parseString(value).getAsJsonArray();
         for (JsonElement rate : rates) {
-            midrates.add(rate.getAsJsonObject().get("cena").getAsDouble() / 100);
+            midrates.add(new Rate(rate.getAsJsonObject().get("cena").getAsDouble() / 100, rate.getAsJsonObject().get("data").getAsString()));
         }
         return midrates;
     }
 
-    public List<Double> getRates(String echangeCode, String start, String end) throws Exception {
+    public List<Rate> getRates(String echangeCode, String start, String end) throws Exception {
         if (echangeCode == "GOLD") {
             return getGoldRates(echangeCode, start, end);
         } else {
