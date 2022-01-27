@@ -78,7 +78,6 @@ public class DrawingPanel extends JPanel {
         double windowWidth = this.getDrawWidth();
         double windowHeight = this.getDrawHeight();
         if (days < 2 || exchangesRates.isEmpty()) return;
-        days = exchangesRates.get(0).rates.size();
         Map<String, List<Point>> exchanges = new HashMap<String, List<Point>>();
         double maxVal = exchangesRates.get(0).rates.get(0).getValue();
         double minVal = exchangesRates.get(0).rates.get(0).getValue();
@@ -94,7 +93,7 @@ public class DrawingPanel extends JPanel {
             }
         }
 
-        int exIndex = 0;
+        int exIndex;
         double yScale = (windowHeight - 20) / (maxVal - minVal);
 
         for (ExchangeData exchangeRates : exchangesRates) {
@@ -131,58 +130,11 @@ public class DrawingPanel extends JPanel {
             exchanges.get(exchangeRates.code)
                     .add(new Point(windowWidth, windowHeight - (yScale * (exchangeRates.rates.get(exchangeRates.rates.size() - 1).getValue() - minVal) + 10)));
         }
-        System.out.print("------\n");
 
-        /*if (maxVal - minVal < 0.001) return;
+        drawPlot((Graphics2D) g, exchangesRates, exchanges, windowWidth, windowHeight, minVal, maxVal);
+    }
 
-        if (windowWidth >= days) {
-            double xInterval = windowWidth / (days - 1);
-            double xIndex = 0;
-            try {
-                for (int i = 0; i < exchangesRates.get(0).rates.size(); i++) {
-                    for (ExchangeData exchangeRates : exchangesRates) {
-                        exchanges.get(exchangeRates.code)
-                                .add(new Point(Math.ceil(xIndex), windowHeight - (yScale * (exchangeRates.rates.get(i).getValue() - minVal) + 10)));
-                    }
-                    xIndex += xInterval;
-                }
-            } catch (Exception exception) {
-                System.out.print(exception);
-            }
-        } else {
-            try {
-                double xScale = (days - 2) / (windowWidth - 1);
-                double xIndex = 0;
-                int xPrev = 0;
-                int xActual = 0;
-                for (int i = 0; i < windowWidth; i++) {
-                    for (ExchangeData exchangeRates : exchangesRates) {
-                        double avgVal = 0;
-                        for (int j = xPrev; j <= xActual; j++) {
-                            if (j < exchangeRates.rates.size())
-                                avgVal += exchangeRates.rates.get(j).getValue();
-                            else {
-                                xActual--;
-                            }
-                        }
-                        if (xActual != xPrev) {
-                            avgVal /= (xActual - xPrev + 1);
-                            exchanges.get(exchangeRates.code)
-                                    .add(new Point(i, windowHeight - (yScale * (avgVal - minVal) + 10)));
-                        }
-                    }
-                    xPrev = xActual + 1;
-                    xIndex += xScale;
-                    xActual = (int) Math.ceil(xIndex);
-                }
-            } catch (Exception exception) {
-                System.out.print(exception);
-            }
-        }
-*/
-
-        Graphics2D graphics = (Graphics2D) g;
-
+    private void drawPlot(Graphics2D graphics, List<ExchangeData> exchangesRates, Map<String, List<Point>> exchanges, double windowWidth, double windowHeight, double minVal, double maxVal) {
         graphics.setColor(Color.gray);
         for (int i = 0; i < windowHeight; i += 10) {
             graphics.drawLine(margin, i, (int) windowWidth + margin, i);

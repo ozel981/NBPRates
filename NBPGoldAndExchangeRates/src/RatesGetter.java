@@ -21,16 +21,27 @@ public class RatesGetter implements ActionListener {
         this.drawingPanel = drawingPanel;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    public LocalDate getStartDate(LocalDate end) {
         LocalDate start = LocalDate.now().minusDays(10);
-        LocalDate end = LocalDate.now();
         try {
             start = LocalDate.parse(startDate.getText());
         } catch (Exception exception) {
             startDate.setText("2013-01-01");
             start = LocalDate.parse(startDate.getText());
         }
+        if (start.isBefore(LocalDate.of(2013, 1, 1))) {
+            start = LocalDate.of(2013, 1, 1);
+            startDate.setText("2013-01-01");
+        }
+        if (start.isAfter(end.minusDays(10))) {
+            start = end.minusDays(10);
+            startDate.setText(start.toString());
+        }
+        return start;
+    }
+
+    public LocalDate getEndDate() {
+        LocalDate end = LocalDate.now();
         try {
             end = LocalDate.parse(endDate.getText());
         } catch (Exception exception) {
@@ -41,18 +52,17 @@ public class RatesGetter implements ActionListener {
             end = LocalDate.now();
             endDate.setText(end.toString());
         }
-        if (end.isBefore(LocalDate.of(2013,1,11))) {
-            end = LocalDate.of(2013,1,11);
+        if (end.isBefore(LocalDate.of(2013, 1, 11))) {
+            end = LocalDate.of(2013, 1, 11);
             endDate.setText(end.toString());
         }
-        if (start.isBefore(LocalDate.of(2013,1,1))) {
-            start = LocalDate.of(2013,1,1);
-            startDate.setText("2013-01-01");
-        }
-        if (start.isAfter(end.minusDays(10))) {
-            start = end.minusDays(10);
-            startDate.setText(start.toString());
-        }
+        return end;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        LocalDate end = getEndDate();
+        LocalDate start = getStartDate(end);
         List<ExchangeData> exchangesRates = new ArrayList<ExchangeData>();
         for (CheckListItem exchange : exchanges) {
             if (exchange.isSelected()) {
