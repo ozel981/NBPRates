@@ -163,6 +163,10 @@ public class DrawingPanel extends JPanel {
             }
         }
         graphics.setColor(Color.black);
+
+        graphics.drawString("PLN/",0,(int)windowHeight + 4);
+        graphics.drawString("data",0,(int)windowHeight + margin / 2);
+
         graphics.setBackground(Color.white);
         graphics.drawString(df.format(maxVal), 3, 10);
         graphics.drawString(df.format(minVal), 3, (int) (windowHeight - 10));
@@ -189,5 +193,6 @@ public class DrawingPanel extends JPanel {
             }
             graphics.drawLine(i, (int) windowHeight - 2, i, (int) windowHeight);
         }
+
     }
 }
