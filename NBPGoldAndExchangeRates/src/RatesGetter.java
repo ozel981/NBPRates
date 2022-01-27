@@ -21,7 +21,7 @@ public class RatesGetter implements ActionListener {
         this.drawingPanel = drawingPanel;
     }
 
-    public LocalDate getStartDate(LocalDate end) {
+    private LocalDate getStartDate(LocalDate end) {
         LocalDate start = LocalDate.now().minusDays(10);
         try {
             start = LocalDate.parse(startDate.getText());
@@ -40,7 +40,7 @@ public class RatesGetter implements ActionListener {
         return start;
     }
 
-    public LocalDate getEndDate() {
+    private LocalDate getEndDate() {
         LocalDate end = LocalDate.now();
         try {
             end = LocalDate.parse(endDate.getText());
